@@ -148,6 +148,10 @@ SECURITY_*.md
 SET_NEW_API_KEY.md
 api-keys.txt
 bfg.jar
+CRITICAL_SECURITY_ALERT.md
+GIT_HISTORY_CLEANUP.md
+PROJECT_SECURITY_STATUS.md
+NEXT_STEPS.md
 
 # 테스트 및 임시 파일들
 test_*.py
