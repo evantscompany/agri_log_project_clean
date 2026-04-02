@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # MySQL 데이터베이스
+  mysql:
+    image: mysql:8.0
+    container_name: agri_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-agrilog_db}
+      MYSQL_USER: ${MYSQL_USER:-agri_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Seoul
+    ports:
+      - "3307:3306"  # 로컬 MySQL과 충돌 방지
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - agri_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: agri_backend
+    restart: unless-stopped
+    environment:
+      # 데이터베이스 설정
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER:-agri_user}
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE:-agrilog_db}
+      
+      # API 키 (환경변수로 주입)
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GOOGLE_APPLICATION_CREDENTIALS: /app/credentials/google-credentials.json
+      
+      # 기타 설정
+      TZ: Asia/Seoul
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/credentials:/app/credentials:ro
+      - ./backend/ML:/app/ML:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - agri_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend (React + Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+        VITE_OPENAI_API_KEY: ${OPENAI_API_KEY}
+    container_name: agri_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - agri_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  agri_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

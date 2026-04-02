@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agri Log - 농기계 스마트 관리 플랫폼</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-icon">🚜</span>
+                    <span class="logo-text">Agri Log</span>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home" class="nav-link active">홈</a></li>
+                    <li><a href="#animation-demo" class="nav-link">작동 방식</a></li>
+                    <li><a href="#features" class="nav-link">주요 기능</a></li>
+                    <li><a href="#business-model" class="nav-link">비즈니스 모델</a></li>
+                    <li><a href="#app" class="nav-link app-link">앱 시작하기</a></li>
+                </ul>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <!-- Background Image Slideshow -->
+        <div class="hero-background-slider">
+            <div class="hero-bg-slide active" style="background-image: url('resources/존디어 트랙터.jpg');"></div>
+            <div class="hero-bg-slide" style="background-image: url('resources/대동트랙터.jpg');"></div>
+            <div class="hero-bg-slide" style="background-image: url('resources/엔진사진.jpg');"></div>
+            <div class="hero-bg-slide" style="background-image: url('resources/기어 깔끔한 사진.jpg');"></div>
+            <div class="hero-bg-slide" style="background-image: url('resources/이력관리.jpg');"></div>
+            <div class="hero-bg-overlay"></div>
+        </div>
+
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    농기계 관리의 새로운 기준<br>
+                    <span class="gradient-text">Agri Log</span>
+                </h1>
+                <p class="hero-subtitle">
+                    OCR 기술로 정비 이력을 자동화하고,<br>
+                    AI가 분석하는 스마트 농기계 관리 플랫폼
+                </p>
+
+                <!-- Integrated Search Box -->
+                <div class="hero-search-container">
+                    <div class="hero-search-box">
+                        <input 
+                            type="text" 
+                            id="vinSearchInput" 
+                            placeholder="기대번호 입력 (예: DC008524384)"
+                            class="hero-search-input"
+                        >
+                        <button id="vinSearchBtn" class="hero-search-btn">
+                            <span class="search-icon">🔍</span>
+                            조회하기
+                        </button>
+                    </div>
+                    <div id="searchLoading" class="search-loading" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <p>데이터를 불러오는 중...</p>
+                    </div>
+                </div>
+
+                <div class="hero-buttons">
+                    <a href="#app" class="btn btn-primary">앱 시작하기</a>
+                    <a href="#animation-demo" class="btn btn-secondary">작동 방식 보기</a>
+                </div>
+
+                <!-- Search Results in Hero -->
+                <div id="heroSearchResults" class="hero-search-results" style="display: none;">
+                    <div class="hero-result-card price-highlight">
+                        <div class="result-icon">💰</div>
+                        <h3>예상 중고 시세</h3>
+                        <div class="price-big" id="heroPredictedPrice">-</div>
+                        <div class="confidence-tag" id="heroConfidence">-</div>
+                    </div>
+                    <div class="hero-result-card">
+                        <div class="result-icon">🚜</div>
+                        <h3>농기계 정보</h3>
+                        <div class="info-row">
+                            <span>기종:</span>
+                            <span id="heroType">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span>모델:</span>
+                            <span id="heroModel">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span>가동시간:</span>
+                            <span id="heroHours">-</span>
+                        </div>
+                    </div>
+                    <div class="hero-result-card test-data">
+                        <div class="test-badge">테스트 데이터</div>
+                        <div class="result-icon">📊</div>
+                        <h3>정비 이력</h3>
+                        <div class="info-row">
+                            <span>총 정비 건수:</span>
+                            <span id="heroRecords">3건</span>
+                        </div>
+                        <div class="info-row">
+                            <span>총 정비 비용:</span>
+                            <span id="heroCost">741,400원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">OCR</div>
+                        <div class="stat-label">자동 인식</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">AI</div>
+                        <div class="stat-label">전문가 소견</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">ML</div>
+                        <div class="stat-label">시세 예측</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Showcase Section -->
+    <section class="feature-showcase">
+        <div class="container">
+            <div class="showcase-grid">
+                <div class="showcase-item">
+                    <img src="resources/엔진사진.jpg" alt="엔진 관리" class="showcase-img">
+                    <div class="showcase-content">
+                        <h3>🔧 정밀 엔진 관리</h3>
+                        <p>엔진 상태를 실시간으로 모니터링하고 예방 정비를 통해 장비 수명을 연장하세요</p>
+                    </div>
+                </div>
+                <div class="showcase-item reverse">
+                    <img src="resources/기어 깔끔한 사진.jpg" alt="부품 관리" class="showcase-img">
+                    <div class="showcase-content">
+                        <h3>⚙️ 스마트 부품 관리</h3>
+                        <p>모든 부품의 교체 주기와 상태를 자동으로 추적하여 최적의 성능을 유지하세요</p>
+                    </div>
+                </div>
+                <div class="showcase-item">
+                    <img src="resources/이력관리.jpg" alt="이력 관리" class="showcase-img">
+                    <div class="showcase-content">
+                        <h3>📊 완벽한 이력 관리</h3>
+                        <p>모든 정비 기록이 자동으로 저장되어 언제든지 확인할 수 있습니다</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Feature Animation Demo Section -->
+    <section id="animation-demo" class="section animation-demo-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">How It Works</span>
+                <h2 class="section-title">작동 방식</h2>
+                <p class="section-subtitle">Agri Log의 핵심 기능을 애니메이션으로 확인하세요</p>
+            </div>
+
+            <div class="demo-tabs">
+                <button class="demo-tab active" data-demo="ocr">📸 OCR 스캔</button>
+                <button class="demo-tab" data-demo="qr">📱 QR 정비</button>
+                <button class="demo-tab" data-demo="search">🔍 기대번호 검색</button>
+                <button class="demo-tab" data-demo="history">📊 이력 조회</button>
+                <button class="demo-tab" data-demo="ai">🤖 AI 분석</button>
+            </div>
+
+            <div class="demo-content-wrapper">
+                <!-- OCR Demo -->
+                <div class="demo-content active" id="demo-ocr">
+                    <div class="demo-animation">
+                        <div class="phone-mockup">
+                            <div class="phone-screen">
+                                <div class="scan-animation">
+                                    <div class="receipt-image"></div>
+                                    <div class="scan-line"></div>
+                                    <div class="ocr-results">
+                                        <div class="ocr-item">기대번호: DC008524384</div>
+                                        <div class="ocr-item">정비업체: 상진농기계</div>
+                                        <div class="ocr-item">총 비용: 536,400원</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="demo-description">
+                            <h3>📸 명세서 자동 인식</h3>
+                            <p>정비명세서를 촬영하면 Google Vision API가 자동으로 기대번호, 비용, 정비업체를 추출합니다.</p>
+                            <ul class="demo-features">
+                                <li>✓ 다양한 영수증 포맷 지원</li>
+                                <li>✓ 한글 인식 정확도 99%</li>
+                                <li>✓ 3초 이내 자동 저장</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Mechanic Demo -->
+                <div class="demo-content" id="demo-qr">
+                    <div class="demo-animation">
+                        <div class="phone-mockup">
+                            <div class="phone-screen">
+                                <div class="qr-animation">
+                                    <div class="qr-code"></div>
+                                    <div class="qr-scan-line"></div>
+                                    <div class="qr-success">
+                                        <div class="success-icon">✓</div>
+                                        <div class="qr-info">
+                                            <div class="qr-item">트랙터: DC008524384</div>
+                                            <div class="qr-item">정비 시작</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="demo-description">
+                            <h3>📱 QR 코드 정비 관리</h3>
+                            <p>정비업체에서 트랙터의 QR 코드를 스캔하면 즉시 이력 관리를 시작할 수 있습니다.</p>
+                            <ul class="demo-features">
+                                <li>✓ QR 스캔으로 즉시 접근</li>
+                                <li>✓ 정비 내역 실시간 입력</li>
+                                <li>✓ 부품 교체 자동 기록</li>
+                                <li>✓ 소유자에게 자동 알림</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Demo -->
+                <div class="demo-content" id="demo-search">
+                    <div class="demo-animation">
+                        <div class="search-demo-box">
+                            <div class="typing-animation">
+                                <input type="text" class="demo-input" value="" readonly>
+                                <div class="cursor"></div>
+                            </div>
+                            <div class="search-results-animation">
+                                <div class="result-item">
+                                    <span class="result-label">기종</span>
+                                    <span class="result-value">콤바인</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">모델</span>
+                                    <span class="result-value">NSC850</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">가동시간</span>
+                                    <span class="result-value">628시간</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="demo-description">
+                            <h3>🔍 즉시 검색</h3>
+                            <p>기대번호만 입력하면 등록된 모든 정보를 실시간으로 조회할 수 있습니다.</p>
+                            <ul class="demo-features">
+                                <li>✓ 실시간 데이터베이스 조회</li>
+                                <li>✓ 상세 정보 즉시 표시</li>
+                                <li>✓ 정비 이력 전체 확인</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Demo -->
+                <div class="demo-content" id="demo-history">
+                    <div class="demo-animation">
+                        <div class="history-demo-box">
+                            <div class="timeline-animation">
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <span class="timeline-date">2026-03-16</span>
+                                        <span class="timeline-desc">유압펌프 교체</span>
+                                        <span class="timeline-cost">536,400원</span>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <span class="timeline-date">2026-02-10</span>
+                                        <span class="timeline-desc">엔진오일 교환</span>
+                                        <span class="timeline-cost">85,000원</span>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <span class="timeline-date">2026-01-05</span>
+                                        <span class="timeline-desc">정기점검</span>
+                                        <span class="timeline-cost">120,000원</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="demo-description">
+                            <h3>📊 이력 관리</h3>
+                            <p>모든 정비 내역이 시간순으로 정리되어 농기계 관리 상태를 한눈에 파악할 수 있습니다.</p>
+                            <ul class="demo-features">
+                                <li>✓ 타임라인 형태 표시</li>
+                                <li>✓ 비용 추이 분석</li>
+                                <li>✓ 명세서 이미지 보관</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Demo -->
+                <div class="demo-content" id="demo-ai">
+                    <div class="demo-animation">
+                        <div class="ai-demo-box">
+                            <div class="ai-analysis-animation">
+                                <div class="ai-header">
+                                    <span class="ai-icon">🤖</span>
+                                    <span class="ai-title">AI 전문가 분석 중...</span>
+                                </div>
+                                <div class="ai-progress">
+                                    <div class="progress-bar"></div>
+                                </div>
+                                <div class="ai-result">
+                                    <p class="ai-text">
+                                        해당 콤바인 기종의 유압작업 부품 노후화로 인한 정밀 점검 및 교체 작업이 실시되었습니다. 
+                                        최근 정비 이력을 분석한 결과, 엔진 계통은 양호하나 유압 시스템의 주기적 관리가 필요합니다.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="demo-description">
+                            <h3>🤖 AI 전문가 소견</h3>
+                            <p>정비 데이터를 AI가 분석하여 전문가 수준의 진단 의견을 제공합니다.</p>
+                            <ul class="demo-features">
+                                <li>✓ 계통별 상태 분석</li>
+                                <li>✓ 예방 정비 제안</li>
+                                <li>✓ 전문 용어 쉬운 설명</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section id="problem" class="section problem-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Problem Statement</span>
+                <h2 class="section-title">해결하고자 하는 문제</h2>
+                <p class="section-subtitle">농기계 산업의 현재 문제점과 Agri Log의 솔루션</p>
+            </div>
+
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">📄</div>
+                    <h3>정비 이력 관리의 부재</h3>
+                    <p class="problem-desc">대다수의 농민이 정비 명세서를 종이 형태로 보관하거나 분실하여, 기계의 정확한 상태를 증명하기 어려움</p>
+                    <div class="solution">
+                        <span class="solution-tag">✓ Solution</span>
+                        <p>사진 한 장으로 데이터베이스화하여 영구 보관 및 관리</p>
+                    </div>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-icon">⚖️</div>
+                    <h3>정보의 비대칭성</h3>
+                    <p class="problem-desc">중고 거래 시 구매자는 관리 이력을 알 수 없고, 판매자는 적정 가격 산정 기준이 부족하여 불신이 발생</p>
+                    <div class="solution">
+                        <span class="solution-tag">✓ Solution</span>
+                        <p>객관적 정비 데이터와 ML 모델로 투명한 중고 시세 형성</p>
+                    </div>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-icon">🔧</div>
+                    <h3>유지보수 전문성 결여</h3>
+                    <p class="problem-desc">복잡한 부품명과 정비 내용을 이해하기 어려워 예방 정비 타이밍을 놓치고 과도한 수리비가 지출됨</p>
+                    <div class="solution">
+                        <span class="solution-tag">✓ Solution</span>
+                        <p>AI 분석으로 기술 용어를 쉽게 풀이하고 계통별 진단 제공</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section features-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Core Features</span>
+                <h2 class="section-title">주요 기능</h2>
+                <p class="section-subtitle">Agri Log가 제공하는 핵심 기능들</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <h3>OCR 기반 자동화</h3>
+                    <p>Google Vision API를 통해 명세서 내 기대번호, 모델명, 총 비용, 정비업체명을 자동 인식합니다.</p>
+                    <ul class="feature-list">
+                        <li>다양한 영수증 포맷 지원</li>
+                        <li>한글 인코딩 문제 해결</li>
+                        <li>정규식 기반 지능형 파싱</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>VIN 파싱 시스템</h3>
+                    <p>대동 등 주요 제조사의 기대번호 규칙을 분석하여 기종, 모델, 제작 연도를 자동으로 식별합니다.</p>
+                    <ul class="feature-list">
+                        <li>제조사별 규칙 분석</li>
+                        <li>중복 등록 검증</li>
+                        <li>데이터 무결성 확보</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>중고 시세 예측</h3>
+                    <p>머신러닝 모델을 통해 기대번호와 가동시간 기반으로 예상 시세를 산출합니다.</p>
+                    <ul class="feature-list">
+                        <li>RandomForest/Linear Regression</li>
+                        <li>신뢰도 등급 제공</li>
+                        <li>실시간 가격 예측</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI 전문가 소견</h3>
+                    <p>교체 부품 데이터를 분석하여 엔진, 유압 등 주요 계통의 상태를 전문가 관점에서 진단합니다.</p>
+                    <ul class="feature-list">
+                        <li>계통별 기술 분석</li>
+                        <li>예방 정비 제안</li>
+                        <li>잠재적 결함 가능성 안내</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>정비 이력 관리</h3>
+                    <p>모든 정비 내역을 체계적으로 관리하고 시각화하여 농기계 상태를 한눈에 파악합니다.</p>
+                    <ul class="feature-list">
+                        <li>정비명세서 이미지 보관</li>
+                        <li>비용 추이 분석</li>
+                        <li>부품 교체 이력 추적</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>모바일 최적화</h3>
+                    <p>언제 어디서나 스마트폰으로 농기계 정보를 확인하고 관리할 수 있습니다.</p>
+                    <ul class="feature-list">
+                        <li>반응형 디자인</li>
+                        <li>터치 최적화 UI</li>
+                        <li>빠른 로딩 속도</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section id="technology" class="section tech-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Tech Stack</span>
+                <h2 class="section-title">기술 스택</h2>
+                <p class="section-subtitle">최신 기술로 구현된 안정적인 플랫폼</p>
+            </div>
+
+            <div class="tech-grid">
+                <div class="tech-category">
+                    <h3 class="tech-category-title">Frontend</h3>
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <span class="tech-name">React 18</span>
+                            <span class="tech-badge">UI Framework</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">Vite</span>
+                            <span class="tech-badge">Build Tool</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">TailwindCSS</span>
+                            <span class="tech-badge">Styling</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">Axios</span>
+                            <span class="tech-badge">HTTP Client</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-category">
+                    <h3 class="tech-category-title">Backend</h3>
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <span class="tech-name">FastAPI</span>
+                            <span class="tech-badge">API Framework</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">Python</span>
+                            <span class="tech-badge">Language</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">Uvicorn</span>
+                            <span class="tech-badge">ASGI Server</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">Pydantic</span>
+                            <span class="tech-badge">Validation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-category">
+                    <h3 class="tech-category-title">AI/ML</h3>
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <span class="tech-name">Google Vision API</span>
+                            <span class="tech-badge">OCR</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">Scikit-learn</span>
+                            <span class="tech-badge">ML Library</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">RandomForest</span>
+                            <span class="tech-badge">Model</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">OpenAI GPT</span>
+                            <span class="tech-badge">LLM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Business Model Section -->
+    <section id="business-model" class="section bm-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Business Model</span>
+                <h2 class="section-title">비즈니스 모델</h2>
+                <p class="section-subtitle">다양한 고객층을 위한 맞춤형 가치 제공</p>
+            </div>
+
+            <div class="bm-tabs">
+                <button class="bm-tab active" data-bm="b2c">
+                    <span class="bm-tab-icon">👨‍🌾</span>
+                    <span class="bm-tab-title">농민용 (B2C)</span>
+                </button>
+                <button class="bm-tab" data-bm="b2b">
+                    <span class="bm-tab-icon">🔧</span>
+                    <span class="bm-tab-title">정비소용 (B2B)</span>
+                </button>
+                <button class="bm-tab" data-bm="b2g">
+                    <span class="bm-tab-icon">🏢</span>
+                    <span class="bm-tab-title">기업/기관용 (B2B/B2G)</span>
+                </button>
+            </div>
+
+            <div class="bm-content-wrapper">
+                <!-- B2C: 농민용 -->
+                <div class="bm-content active" id="bm-b2c">
+                    <div class="bm-hero">
+                        <div class="bm-hero-text">
+                            <h3 class="bm-title">농민용: 손해 보지 않는 관리</h3>
+                            <p class="bm-subtitle">기본 기능 무료(Freemium), 고급 분석은 구독 또는 수수료</p>
+                        </div>
+                        <div class="bm-hero-visual">
+                            <div class="bm-coin-animation">
+                                <div class="coin">💰</div>
+                                <div class="coin">💰</div>
+                                <div class="coin">💰</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bm-revenue-grid">
+                        <div class="bm-revenue-card">
+                            <div class="revenue-icon">🤝</div>
+                            <h4>중고 거래 중개</h4>
+                            <p class="revenue-desc">예측 시세와 관리 이력 기반 신뢰도 높은 직거래 장터</p>
+                            <div class="revenue-flow">
+                                <div class="flow-step">이력 관리</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">시세 예측</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">거래 성사</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step highlight">수수료 수익</div>
+                            </div>
+                        </div>
+
+                        <div class="bm-revenue-card">
+                            <div class="revenue-icon">🔔</div>
+                            <h4>정비 시기 알림</h4>
+                            <p class="revenue-desc">소모품 교체 주기 알림으로 제휴 정비소 연결</p>
+                            <div class="revenue-flow">
+                                <div class="flow-step">알림 발송</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">정비소 연결</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step highlight">리퍼럴 수익</div>
+                            </div>
+                        </div>
+
+                        <div class="bm-revenue-card">
+                            <div class="revenue-icon">📄</div>
+                            <h4>자산 가치 증명</h4>
+                            <p class="revenue-desc">완벽한 정비 이력 PDF 리포트 발행</p>
+                            <div class="revenue-flow">
+                                <div class="flow-step">이력 축적</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">PDF 생성</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step highlight">소액 과금</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B2B: 정비소용 -->
+                <div class="bm-content" id="bm-b2b">
+                    <div class="bm-hero">
+                        <div class="bm-hero-text">
+                            <h3 class="bm-title">정비소용: 귀찮은 서류 작업의 자동화</h3>
+                            <p class="bm-subtitle">SaaS(소프트웨어 서비스) 구독 모델</p>
+                        </div>
+                        <div class="bm-hero-visual">
+                            <div class="bm-chart-animation">
+                                <div class="chart-bar" style="height: 60%"></div>
+                                <div class="chart-bar" style="height: 80%"></div>
+                                <div class="chart-bar" style="height: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bm-revenue-grid">
+                        <div class="bm-revenue-card">
+                            <div class="revenue-icon">💻</div>
+                            <h4>정비 관리 솔루션</h4>
+                            <p class="revenue-desc">명세서 OCR 자동 입력, 고객 장비 이력 관리 시스템</p>
+                            <div class="revenue-flow">
+                                <div class="flow-step">OCR 스캔</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">자동 입력</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">이력 관리</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step highlight">월 구독료</div>
+                            </div>
+                        </div>
+
+                        <div class="bm-revenue-card">
+                            <div class="revenue-icon">📦</div>
+                            <h4>부품 재고 연동</h4>
+                            <p class="revenue-desc">부족한 부품 즉시 주문 가능한 B2B 커머스</p>
+                            <div class="revenue-flow">
+                                <div class="flow-step">재고 확인</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">자동 주문</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step highlight">거래 수수료</div>
+                            </div>
+                        </div>
+
+                        <div class="bm-revenue-card">
+                            <div class="revenue-icon">📢</div>
+                            <h4>고객 타겟 마케팅</h4>
+                            <p class="revenue-desc">정비 주기 도래 고객 대상 쿠폰 발행 툴</p>
+                            <div class="revenue-flow">
+                                <div class="flow-step">타겟 분석</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">쿠폰 발행</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step highlight">마케팅 툴 이용료</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B2B/B2G: 기업/기관용 -->
+                <div class="bm-content" id="bm-b2g">
+                    <div class="bm-hero">
+                        <div class="bm-hero-text">
+                            <h3 class="bm-title">기업/기관용: 현장의 데이터</h3>
+                            <p class="bm-subtitle">데이터 판매 및 라이선스, 대규모 시스템 연동</p>
+                        </div>
+                        <div class="bm-hero-visual">
+                            <div class="bm-data-animation">
+                                <div class="data-node"></div>
+                                <div class="data-node"></div>
+                                <div class="data-node"></div>
+                                <div class="data-connection"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bm-revenue-grid">
+                        <div class="bm-revenue-card">
+                            <div class="revenue-icon">🏭</div>
+                            <h4>제조사 데이터</h4>
+                            <p class="revenue-desc">기종별 결함 빈도, 소모품 교체 주기 등 실제 필드 데이터</p>
+                            <div class="revenue-flow">
+                                <div class="flow-step">데이터 수집</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">익명화 처리</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">리포트 생성</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step highlight">데이터 판매</div>
+                            </div>
+                        </div>
+
+                        <div class="bm-revenue-card">
+                            <div class="revenue-icon">🏛️</div>
+                            <h4>농협/정부 API</h4>
+                            <p class="revenue-desc">면세유 배정, 보조금 산정용 실제 가동시간 데이터</p>
+                            <div class="revenue-flow">
+                                <div class="flow-step">가동시간 추적</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">API 연동</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step highlight">라이선스 수익</div>
+                            </div>
+                        </div>
+
+                        <div class="bm-revenue-card">
+                            <div class="revenue-icon">🏦</div>
+                            <h4>금융/보험 데이터</h4>
+                            <p class="revenue-desc">담보 대출 시세 평가, 정비 이력 기반 보험 요율 산정</p>
+                            <div class="revenue-flow">
+                                <div class="flow-step">ML 시세 예측</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">이력 분석</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step highlight">데이터 제공료</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="app" class="section cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">지금 바로 시작하세요</h2>
+                <p class="cta-subtitle">농기계 관리의 새로운 경험을 만나보세요</p>
+                <button class="btn btn-large btn-app" id="startAppBtn">
+                    <span class="btn-icon">🚜</span>
+                    앱 시작하기
+                </button>
+                <p class="cta-note">* 앱을 시작하면 Agri Log 대시보드로 이동합니다</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <span class="logo-icon">🚜</span>
+                        <span class="logo-text">Agri Log</span>
+                    </div>
+                    <p class="footer-desc">농기계 스마트 관리 플랫폼</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>제품</h4>
+                        <ul>
+                            <li><a href="#features">주요 기능</a></li>
+                            <li><a href="#technology">기술 스택</a></li>
+                            <li><a href="#app">앱 시작</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>회사</h4>
+                        <ul>
+                            <li><a href="#problem">문제 해결</a></li>
+                            <li><a href="#home">소개</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Agri Log. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

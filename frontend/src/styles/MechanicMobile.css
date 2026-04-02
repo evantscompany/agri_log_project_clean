@@ -1,0 +1,425 @@
+/* 정비사 포털 모바일 반응형 스타일 */
+
+/* 모바일 기본 설정 */
+@media (max-width: 768px) {
+  /* 전체 컨테이너 */
+  .mechanic-container {
+    padding: 12px;
+    overflow-x: hidden;
+  }
+
+  /* 버튼 그룹 */
+  .button-group {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .button-group button {
+    width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+    padding: 12px 16px;
+    min-height: 44px;
+  }
+
+  /* 모달 */
+  .modal-content {
+    width: 95%;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 20px auto;
+  }
+
+  .modal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  /* 테이블 */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+
+  table {
+    min-width: 600px;
+    font-size: 14px;
+  }
+
+  th, td {
+    white-space: nowrap;
+    padding: 8px 4px;
+    font-size: 13px;
+  }
+
+  /* 부품 카드 */
+  .part-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .part-name {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+
+  .part-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+  }
+
+  /* OCR 결과 */
+  .ocr-result {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 13px;
+    padding: 12px;
+  }
+
+  /* 정비 이력 카드 */
+  .maintenance-record {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .record-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .record-title {
+    font-size: 16px;
+    word-break: keep-all;
+  }
+
+  .record-date {
+    font-size: 14px;
+  }
+
+  /* 입력 필드 */
+  input, select, textarea {
+    width: 100%;
+    font-size: 16px; /* iOS 줌 방지 */
+    padding: 12px;
+  }
+
+  /* 이미지 업로드 */
+  .image-upload-area {
+    min-height: 200px;
+    padding: 20px;
+  }
+
+  .upload-preview {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* 수리 히스토리 */
+  .history-list {
+    gap: 12px;
+  }
+
+  .history-item {
+    padding: 12px;
+  }
+
+  .history-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .history-item-title {
+    font-size: 15px;
+    word-break: keep-all;
+  }
+
+  /* 상세 정보 모달 */
+  .detail-modal {
+    width: 95%;
+    max-height: 85vh;
+  }
+
+  .detail-section {
+    padding: 12px;
+  }
+
+  .detail-label {
+    font-size: 13px;
+  }
+
+  .detail-value {
+    font-size: 14px;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* 부품 목록 테이블 */
+  .parts-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .parts-table {
+    min-width: 500px;
+  }
+
+  /* 정비사 소견 */
+  .mechanic-notes {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* QR 스캔 */
+  .qr-scanner {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .qr-video {
+    width: 100%;
+    height: auto;
+  }
+
+  /* 정렬 개선 */
+  .flex-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .flex-item {
+    width: 100%;
+  }
+
+  /* 텍스트 정렬 */
+  .text-truncate {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  /* 가격 표시 */
+  .price-display {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* 날짜 표시 */
+  .date-display {
+    font-size: 14px;
+  }
+
+  /* 상태 배지 */
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* 액션 버튼 */
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .action-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  /* 그리드 레이아웃 */
+  .grid-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* 카드 레이아웃 */
+  .card {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .card-body {
+    padding: 12px 0;
+  }
+
+  /* 폼 레이아웃 */
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-group {
+    width: 100%;
+  }
+
+  .form-label {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  /* 스크롤 힌트 */
+  .scroll-hint {
+    display: block;
+    text-align: center;
+    padding: 8px;
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* 터치 영역 확대 */
+  button, a, .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 아이콘 크기 */
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* 로딩 스피너 */
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* 에러 메시지 */
+  .error-message {
+    padding: 12px;
+    font-size: 14px;
+    word-wrap: break-word;
+  }
+
+  /* 성공 메시지 */
+  .success-message {
+    padding: 12px;
+    font-size: 14px;
+    word-wrap: break-word;
+  }
+}
+
+/* 작은 모바일 (iPhone SE 등) */
+@media (max-width: 375px) {
+  .modal-content {
+    width: 98%;
+    padding: 12px;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+  th, td {
+    padding: 6px 2px;
+    font-size: 11px;
+  }
+
+  .button-group button {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  .part-card {
+    padding: 10px;
+  }
+
+  .ocr-result {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+/* 태블릿 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .modal-content {
+    width: 80%;
+    max-width: 800px;
+  }
+
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  table {
+    font-size: 15px;
+  }
+}
+
+/* 가로 모드 */
+@media (max-width: 768px) and (orientation: landscape) {
+  .modal-content {
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+
+  .qr-scanner {
+    max-height: 70vh;
+  }
+}
+
+/* 다크 모드 지원 */
+@media (prefers-color-scheme: dark) {
+  .modal-content {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .table-container {
+    background-color: #2a2a2a;
+  }
+
+  input, select, textarea {
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border-color: #444;
+  }
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 고대비 모드 */
+@media (prefers-contrast: high) {
+  button {
+    border: 2px solid currentColor;
+  }
+
+  .card {
+    border: 2px solid currentColor;
+  }
+}

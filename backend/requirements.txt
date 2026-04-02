@@ -1,0 +1,17 @@
+﻿fastapi==0.135.1
+uvicorn==0.41.0
+pydantic==2.12.5
+PyMySQL==1.1.2
+SQLAlchemy==2.0.48
+python-dotenv==1.2.2
+pandas==3.0.1
+numpy==2.4.3
+requests==2.32.5
+beautifulsoup4==4.14.3
+qrcode==8.0
+Pillow==11.1.0
+joblib==1.4.2
+scikit-learn==1.5.2
+google-cloud-vision==3.8.1
+python-multipart==0.0.20
+openai==1.58.1

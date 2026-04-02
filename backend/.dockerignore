@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# Environment files (보안상 제외, docker-compose에서 주입)
+.env
+.env.local
+.env.openai
+
+# Credentials (보안상 제외)
+credentials/
+
+# Uploads (런타임에 볼륨 마운트)
+uploads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# ML models (용량이 크면 별도 관리)
+# ML/*.pkl
+
+# Documentation
+*.md
+!README.md
