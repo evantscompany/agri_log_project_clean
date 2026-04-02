@@ -8,24 +8,72 @@ import colors from '../theme/colors';
 const SplashScreen = ({ onFinish }) => {
   const fadeAnim = new Animated.Value(0);
   const scaleAnim = new Animated.Value(0.3);
+  const rotateAnim = new Animated.Value(0);
+  const pulseAnim = new Animated.Value(1);
+  const titleFadeAnim = new Animated.Value(0);
+  const subtitleFadeAnim = new Animated.Value(0);
+  const taglineFadeAnim = new Animated.Value(0);
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
+    // 로고 회전 애니메이션
+    Animated.loop(
+      Animated.timing(rotateAnim, {
         toValue: 1,
-        duration: 1000,
+        duration: 3000,
+        useNativeDriver: true,
+      })
+    ).start();
+
+    // 펄스 효과
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // 순차적 등장 애니메이션
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 4,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.timing(titleFadeAnim, {
+        toValue: 1,
+        duration: 600,
         useNativeDriver: true,
       }),
-      Animated.spring(scaleAnim, {
+      Animated.timing(subtitleFadeAnim, {
         toValue: 1,
-        friction: 4,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(taglineFadeAnim, {
+        toValue: 1,
+        duration: 500,
         useNativeDriver: true,
       }),
     ]).start();
 
     const timer = setTimeout(() => {
       onFinish();
-    }, 2500);
+    }, 3500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -80,9 +128,8 @@ const styles = StyleSheet.create({
     borderColor: colors.primary.light,
   },
   logoIcon: {
-    fontSize: 20,
+    fontSize: 48,
     fontWeight: 'bold',
-    color: colors.primary.main,
   },
   title: {
     fontSize: 42,

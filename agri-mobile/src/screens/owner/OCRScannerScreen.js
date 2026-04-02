@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, TextInput as RNTextInput, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, TextInput as RNTextInput, TouchableOpacity, Modal } from 'react-native';
 import { Text, Button, Card, ActivityIndicator, ProgressBar } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { apiService } from '../../services/api';
+import { API_CONFIG } from '../../config/api';
 
 const OCRScannerScreen = ({ navigation }) => {
   const [image, setImage] = useState(null);
@@ -11,6 +12,7 @@ const OCRScannerScreen = ({ navigation }) => {
   const [progress, setProgress] = useState(0);
   const [ocrResult, setOcrResult] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
   const [formData, setFormData] = useState({
     vin: '',
     date: new Date().toISOString().split('T')[0],
@@ -294,9 +296,6 @@ const OCRScannerScreen = ({ navigation }) => {
       setLoading(true);
       setProgress(0);
       
-      setProgress(0.3);
-      const uploadResult = await apiService.uploadMaintenanceImage(imageUri);
-      
       setProgress(0.6);
       const ocrData = await apiService.processGoogleVisionOCR(imageUri);
       
@@ -305,6 +304,8 @@ const OCRScannerScreen = ({ navigation }) => {
         text: ocrData.text,
         confidence: ocrData.confidence,
         blocks: ocrData.blocks || [],
+        image_path: ocrData.image_path,
+        image_url: ocrData.image_url,
       });
       
       const extracted = extractReceiptInfo(ocrData.text);
@@ -317,6 +318,8 @@ const OCRScannerScreen = ({ navigation }) => {
         mileage: '',
         vendor: extracted.vendor || '',
         partNumbers: extracted.partNumbers || [],
+        image_path: ocrData.image_path,
+        image_url: ocrData.image_url,
       });
       
       setIsEditing(true);
@@ -326,6 +329,12 @@ const OCRScannerScreen = ({ navigation }) => {
       Alert.alert('오류', error.message || 'OCR 처리 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImagePress = () => {
+    if (formData.image_url || ocrResult?.image_url) {
+      setImageModalVisible(true);
     }
   };
 
@@ -342,23 +351,26 @@ const OCRScannerScreen = ({ navigation }) => {
     try {
       setLoading(true);
       
-      console.log('=== 정비 이력 저장 시작 ===');
+      console.log('=== 정비 이력 저장 시작 (processOCRAndSave 사용) ===');
       console.log('저장 데이터:', {
         vin: formData.vin,
-        service_date: formData.date,
+        date: formData.date,
         description: formData.description,
         cost: parseInt(formData.cost) || 0,
         mileage: parseInt(formData.mileage) || 0,
-        service_company: formData.vendor || '직접 입력',
+        image_path: formData.image_path,
+        ocr_text: ocrResult?.text,
       });
       
-      await apiService.saveMaintenanceRecord({
+      // process-ocr API 사용하여 이미지 경로와 OCR 텍스트 포함하여 저장
+      await apiService.processOCRAndSave({
         vin: formData.vin,
-        service_date: formData.date,
+        date: formData.date,
         description: formData.description,
         cost: parseInt(formData.cost) || 0,
         mileage: parseInt(formData.mileage) || 0,
-        service_company: formData.vendor || '직접 입력',
+        image_path: formData.image_path,
+        ocr_text: ocrResult?.text,
       });
       
       console.log('=== 정비 이력 저장 성공 ===');
@@ -521,6 +533,17 @@ const OCRScannerScreen = ({ navigation }) => {
                     </>
                   )}
 
+                  {(formData.image_url || ocrResult?.image_url) && (
+                    <Button
+                      mode="outlined"
+                      icon="file-document"
+                      onPress={handleImagePress}
+                      style={styles.viewImageButton}
+                    >
+                      정비명세서 보기
+                    </Button>
+                  )}
+
                   <Button
                     mode="contained"
                     icon="content-save"
@@ -536,6 +559,40 @@ const OCRScannerScreen = ({ navigation }) => {
           </>
         )}
       </ScrollView>
+
+      <Modal
+        visible={imageModalVisible}
+        transparent={true}
+        onRequestClose={() => setImageModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <TouchableOpacity 
+            style={styles.modalBackground}
+            onPress={() => setImageModalVisible(false)}
+          >
+            <View style={styles.modalContent}>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setImageModalVisible(false)}
+              >
+                <Ionicons name="close" size={30} color="white" />
+              </TouchableOpacity>
+              {(formData.image_url || ocrResult?.image_url) && (
+                <Image 
+                  source={{ 
+                    uri: (formData.image_url || ocrResult?.image_url).replace(
+                      'http://localhost:8000',
+                      API_CONFIG.BASE_URL.replace('/api/v1', '')
+                    )
+                  }} 
+                  style={styles.fullImage}
+                  resizeMode="contain"
+                />
+              )}
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -678,7 +735,39 @@ const styles = StyleSheet.create({
   partNumberText: {
     fontSize: 12,
     color: '#2E7D32',
-    fontWeight: '600',
+  },
+  viewImageButton: {
+    marginTop: 12,
+    borderRadius: 12,
+    borderColor: '#2E7D32',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  fullImage: {
+    width: '100%',
+    height: '80%',
   },
 });
 

@@ -356,16 +356,16 @@ async def process_ocr_and_save(
                     
                     cursor.execute("""
                         INSERT INTO ocr_raw_data 
-                        (log_id, attachment_id, raw_text, parsed_data, parsing_version, 
+                        (log_id, attachment_id, raw_text, parsed_data, image_path, parsing_version, 
                          parsing_status, extracted_vin, extracted_service_date, 
                          extracted_total_cost, extracted_parts_count, confidence_score)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """, (
-                        log_id, attachment_id, ocr_text, parsed_data_json, '1.0',
+                        log_id, attachment_id, ocr_text, parsed_data_json, image_path, "2.0",
                         parsing_status, vin, date, cost, len(details), confidence_score
                     ))
                     
-                    print(f"OCR 원본 데이터 저장 완료 (파싱 버전: 1.0, 부품: {len(details)}개)")
+                    print(f"OCR 원본 데이터 저장 완료 (파싱 버전: 2.0, 부품: {len(details)}개)")
                     
                     # 추출된 부품 정보를 maintenance_detail 테이블에 저장
                     for detail in details:
@@ -394,11 +394,12 @@ async def process_ocr_and_save(
                     import json
                     cursor.execute("""
                         INSERT INTO ocr_raw_data 
-                        (log_id, attachment_id, raw_text, parsing_status, 
+                        (log_id, attachment_id, raw_text, image_path, parsing_status, 
                          extracted_vin, extracted_service_date, extracted_total_cost, 
                          extracted_parts_count, error_message)
-                        VALUES (%s, %s, %s, 'FAILED', %s, %s, %s, 0, %s)
-                    """, (log_id, attachment_id, ocr_text, vin, date, cost, str(e)))
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (log_id, attachment_id, ocr_text, image_path, "FAILED", 
+                          vin, date, cost, 0, str(e)))
                     print(f"OCR 원본 데이터 저장 완료 (파싱 실패, 오류 기록됨)")
                     # 파싱 실패해도 메인 이력은 저장되도록 계속 진행
             
@@ -455,6 +456,19 @@ async def process_google_vision_ocr(
         # 파일 크기 검증
         if len(contents) > MAX_IMAGE_SIZE:
             raise HTTPException(status_code=400, detail="파일 크기가 너무 큽니다. (최대 10MB)")
+        
+        # 이미지 압축 및 저장
+        compressed_image = compress_image(contents)
+        
+        # 고유 파일명 생성
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        unique_id = str(uuid.uuid4().hex[:32])
+        file_name = f"{unique_id}_{timestamp}.jpg"
+        file_path = os.path.join(UPLOAD_DIR, file_name)
+        
+        # 파일 저장
+        with open(file_path, 'wb') as f:
+            f.write(compressed_image)
         
         # Google Vision API로 OCR 처리
         ocr_result = vision_ocr.extract_text_from_bytes(contents)
@@ -589,6 +603,8 @@ async def process_google_vision_ocr(
             "confidence": ocr_result['confidence'],
             "blocks": ocr_result['blocks'],
             "parsed_data": parsed_data,
+            "image_path": file_path,
+            "image_url": f"http://localhost:8000/{file_path}",
             "message": "OCR 처리가 완료되었습니다."
         }
     

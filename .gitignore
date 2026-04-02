@@ -161,3 +161,4 @@ test_*.py
 # 크롤링 및 데이터 파일
 크롤링용 파일/
 data/
+VSCODE_DATABASE_CONNECTION.md

@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, Alert, TouchableOpacity, RefreshControl, 
 import { Text, Card, Button, ActivityIndicator, Chip, FAB, Portal, Modal } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { apiService } from '../../services/api';
+import { API_CONFIG } from '../../config/api';
 import MechanicChatbot from '../../components/MechanicChatbot';
 
 const MachineDetailScreen = ({ navigation, route }) => {
@@ -53,13 +54,16 @@ const MachineDetailScreen = ({ navigation, route }) => {
 
   const handleImagePress = (imagePath) => {
     if (imagePath) {
+      // API_CONFIG에서 BASE_URL 가져오기
+      const baseUrl = API_CONFIG.BASE_URL.replace('/api/v1', '');
+      
       // 이미 전체 URL인 경우와 상대 경로인 경우 모두 처리
       let fullImageUrl;
       if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-        // localhost를 실제 IP로 변경
-        fullImageUrl = imagePath.replace('http://localhost:8000', 'http://192.168.0.30:8000');
+        // localhost를 실제 서버 URL로 변경
+        fullImageUrl = imagePath.replace('http://localhost:8000', baseUrl);
       } else {
-        fullImageUrl = `http://192.168.0.30:8000${imagePath}`;
+        fullImageUrl = `${baseUrl}${imagePath}`;
       }
       setSelectedImage(fullImageUrl);
       setImageModalVisible(true);

@@ -101,7 +101,7 @@ async def get_machines_list():
     
     try:
         with conn.cursor() as cursor:
-            # 농기계 목록과 각 농기계의 통계 정보를 한 번에 조회
+            # 농기계 목록과 각 농기계의 통계 정보를 한 번에 조회 (정비업체는 삭제된 농기계도 포함)
             sql = """
             SELECT 
                 mi.vin,
@@ -110,6 +110,8 @@ async def get_machines_list():
                 c.cat_name as category,
                 mi.production_year as year,
                 mi.total_hours,
+                mi.is_deleted,
+                mi.deleted_at,
                 COUNT(ml.log_id) as total_records,
                 COALESCE(SUM(ml.total_cost), 0) as total_cost,
                 MAX(ml.service_date) as last_maintenance
@@ -118,8 +120,7 @@ async def get_machines_list():
             LEFT JOIN manufacturer_codes mf ON mm.mfg_code = mf.mfg_code
             LEFT JOIN category_codes c ON mm.cat_code = c.cat_code
             LEFT JOIN maintenance_log ml ON mi.vin = ml.vin
-            WHERE mi.is_deleted = FALSE OR mi.is_deleted IS NULL
-            GROUP BY mi.vin, mm.base_model_name, mf.mfg_name, c.cat_name, mi.production_year, mi.total_hours
+            GROUP BY mi.vin, mm.base_model_name, mf.mfg_name, c.cat_name, mi.production_year, mi.total_hours, mi.is_deleted, mi.deleted_at
             ORDER BY mi.vin
             """
             cursor.execute(sql)
@@ -145,7 +146,9 @@ async def get_machines_list():
                     "totalRecords": row['total_records'],
                     "totalCost": row['total_cost'],
                     "lastMaintenance": str(row['last_maintenance']) if row['last_maintenance'] else None,
-                    "totalHours": row['total_hours'] or 0
+                    "totalHours": row['total_hours'] or 0,
+                    "is_deleted": row['is_deleted'] or False,
+                    "deleted_at": str(row['deleted_at']) if row['deleted_at'] else None
                 })
             
             return {

@@ -30,6 +30,8 @@ class MachineDetail(BaseModel):
     last_maintenance: Optional[str] = Field(None, description="최근 정비일")
     lastMaintenance: Optional[str] = Field(None, description="최근 정비일 (camelCase)")
     hasModelInfo: Optional[bool] = Field(None, description="모델 정보 유무")
+    is_deleted: Optional[bool] = Field(None, description="삭제 여부")
+    deleted_at: Optional[str] = Field(None, description="삭제 일시")
     
     class Config:
         extra = "allow"

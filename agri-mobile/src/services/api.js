@@ -4,7 +4,7 @@ import { API_CONFIG, ENDPOINTS } from '../config/api';
 // Axios 인스턴스 생성
 const apiClient = axios.create({
   baseURL: API_CONFIG.BASE_URL,
-  timeout: 10000, // 10초로 설정 (빠른 에러 확인)
+  timeout: API_CONFIG.TIMEOUT || 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -163,21 +163,38 @@ export const apiService = {
   // 정비 이력 저장
   saveMaintenanceRecord: async (data) => {
     console.log('=== API 호출 시작 ===');
+    console.log('BASE_URL:', API_CONFIG.BASE_URL);
     console.log('URL: POST /history/');
     console.log('데이터:', data);
     
-    const response = await apiClient.post('/history/', {
-      vin: data.vin,
-      service_date: data.service_date,
-      description: data.description,
-      cost: data.cost,
-      mileage: data.mileage,
-      service_company: data.service_company || '직접 입력',
-    });
-    
-    console.log('=== API 응답 수신 ===');
-    console.log('응답:', response.data);
-    return response.data;
+    try {
+      const response = await apiClient.post('/history/', {
+        vin: data.vin,
+        service_date: data.service_date,
+        description: data.description,
+        cost: data.cost,
+        mileage: data.mileage,
+        service_company: data.service_company || '직접 입력',
+      });
+      
+      console.log('=== API 응답 수신 ===');
+      console.log('응답:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('=== API 호출 실패 ===');
+      console.error('에러 타입:', error.constructor.name);
+      console.error('에러 메시지:', error.message);
+      if (error.response) {
+        console.error('응답 상태:', error.response.status);
+        console.error('응답 데이터:', error.response.data);
+      } else if (error.request) {
+        console.error('요청 전송됨, 응답 없음');
+        console.error('요청:', error.request);
+      } else {
+        console.error('요청 설정 오류:', error.message);
+      }
+      throw error;
+    }
   },
 
   // 정비 이력 삭제

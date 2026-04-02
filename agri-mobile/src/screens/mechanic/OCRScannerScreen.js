@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Alert, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, Alert, ScrollView, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { Text, Button, Card, ActivityIndicator, ProgressBar } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { apiService } from '../../services/api';
+import { API_CONFIG } from '../../config/api';
 import colors from '../../theme/colors';
 
 const OCRScannerScreen = ({ navigation, route }) => {
@@ -15,6 +16,7 @@ const OCRScannerScreen = ({ navigation, route }) => {
   const [progress, setProgress] = useState(0);
   const [ocrResult, setOcrResult] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
   const [formData, setFormData] = useState({
     vin: '',
     date: new Date().toISOString().split('T')[0],
@@ -63,11 +65,7 @@ const OCRScannerScreen = ({ navigation, route }) => {
       setLoading(true);
       setProgress(0);
       
-      // 1단계: 이미지 업로드
-      setProgress(0.3);
-      const uploadResult = await apiService.uploadMaintenanceImage(imageUri);
-      
-      // 2단계: Google Vision OCR 처리
+      // Google Vision OCR 처리
       setProgress(0.6);
       const ocrData = await apiService.processGoogleVisionOCR(imageUri);
       
@@ -76,6 +74,8 @@ const OCRScannerScreen = ({ navigation, route }) => {
         text: ocrData.text,
         confidence: ocrData.confidence,
         blocks: ocrData.blocks || [],
+        image_path: ocrData.image_path,
+        image_url: ocrData.image_url,
       });
       
       // 텍스트 파싱
@@ -88,6 +88,8 @@ const OCRScannerScreen = ({ navigation, route }) => {
         description: extracted.description || '',
         cost: extracted.cost || '',
         mileage: '',
+        image_path: ocrData.image_path,
+        image_url: ocrData.image_url,
       });
       
       // 자동으로 편집 모드 활성화
@@ -420,7 +422,7 @@ const OCRScannerScreen = ({ navigation, route }) => {
         date: formData.date,
         description: formData.description,
         cost: Number(formData.cost),
-        image_path: image,
+        image_path: formData.image_path || image,
         ocr_text: ocrResult?.text,
       };
       
@@ -604,6 +606,16 @@ const OCRScannerScreen = ({ navigation, route }) => {
 
       {ocrResult && (
         <View style={styles.actionButtons}>
+          {(formData.image_url || ocrResult?.image_url) && (
+            <Button
+              mode="outlined"
+              icon="file-document"
+              onPress={() => setImageModalVisible(true)}
+              style={[styles.button, styles.viewImageButton]}
+            >
+              정비명세서 보기
+            </Button>
+          )}
           <Button
             mode="outlined"
             onPress={resetForm}
@@ -623,6 +635,40 @@ const OCRScannerScreen = ({ navigation, route }) => {
           </Button>
         </View>
       )}
+
+      <Modal
+        visible={imageModalVisible}
+        transparent={true}
+        onRequestClose={() => setImageModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <TouchableOpacity 
+            style={styles.modalBackground}
+            onPress={() => setImageModalVisible(false)}
+          >
+            <View style={styles.modalContent}>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setImageModalVisible(false)}
+              >
+                <Ionicons name="close" size={30} color="white" />
+              </TouchableOpacity>
+              {(formData.image_url || ocrResult?.image_url) && (
+                <Image 
+                  source={{ 
+                    uri: (formData.image_url || ocrResult?.image_url).replace(
+                      'http://localhost:8000',
+                      API_CONFIG.BASE_URL.replace('/api/v1', '')
+                    )
+                  }} 
+                  style={styles.fullImage}
+                  resizeMode="contain"
+                />
+              )}
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
 
       <View style={{ height: 40 }} />
     </ScrollView>
@@ -783,6 +829,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     gap: 12,
+    flexWrap: 'wrap',
+  },
+  viewImageButton: {
+    flex: 1,
+    minWidth: '100%',
+    borderColor: '#2E7D32',
   },
   resetButton: {
     flex: 1,
@@ -791,6 +843,34 @@ const styles = StyleSheet.create({
   saveButton: {
     flex: 2,
     backgroundColor: '#4CAF50',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  fullImage: {
+    width: '100%',
+    height: '80%',
   },
 });
 

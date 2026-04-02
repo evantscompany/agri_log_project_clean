@@ -93,26 +93,28 @@ async def get_maintenance_records(vin: str):
             """, (vin,))
             machine_info = cursor.fetchone()
             
-            # 정비 이력 조회 (최신순)
+            # 정비 이력 조회 (최신순) - ocr_raw_data의 image_path 포함
             sql = """
             SELECT 
-                log_id,
-                vin,
-                service_date,
-                service_company,
-                ai_summary,
-                total_cost,
-                working_hours
-            FROM maintenance_log
-            WHERE vin = %s
-            ORDER BY service_date DESC, log_id DESC
+                ml.log_id,
+                ml.vin,
+                ml.service_date,
+                ml.service_company,
+                ml.ai_summary,
+                ml.total_cost,
+                ml.working_hours,
+                ocr.image_path as attachment_url
+            FROM maintenance_log ml
+            LEFT JOIN ocr_raw_data ocr ON ml.log_id = ocr.log_id
+            WHERE ml.vin = %s
+            ORDER BY ml.service_date DESC, ml.log_id DESC
             """
             cursor.execute(sql, (vin,))
-            results = cursor.fetchall()
+            records = cursor.fetchall()
             
             # 결과를 프론트엔드 형식에 맞게 변환
-            records = []
-            for row in results:
+            formatted_records = []
+            for row in records:
                 # 부품 상세 정보 조회
                 cursor.execute("""
                     SELECT 
@@ -128,30 +130,17 @@ async def get_maintenance_records(vin: str):
                 
                 details = cursor.fetchall()
                 
-                # 첨부파일 정보 조회
-                cursor.execute("""
-                    SELECT 
-                        attachment_id,
-                        file_path,
-                        original_name
-                    FROM maintenance_attachment
-                    WHERE log_id = %s
-                    LIMIT 1
-                """, (row['log_id'],))
-                
-                attachment = cursor.fetchone()
+                # ocr_raw_data에서 가져온 image_path를 URL로 변환
                 attachment_url = None
-                if attachment and attachment['file_path']:
-                    # 파일 경로를 URL로 변환 (Windows 경로 처리)
+                if row.get('attachment_url'):
+                    # image_path가 있으면 URL로 변환
                     import os
-                    # file_path에서 uploads 이후 경로 추출
-                    file_path = attachment['file_path'].replace('\\', '/')
+                    file_path = row['attachment_url'].replace('\\', '/')
                     if 'uploads/' in file_path:
                         relative_path = file_path.split('uploads/')[-1]
                         attachment_url = f"http://localhost:8000/uploads/{relative_path}"
                     else:
-                        filename = os.path.basename(attachment['file_path'])
-                        attachment_url = f"http://localhost:8000/uploads/maintenance_images/{filename}"
+                        attachment_url = f"http://localhost:8000/{file_path}"
                 
                 # ai_summary에서 작업 유형 추출 (간단한 키워드 매칭)
                 description = row['ai_summary'] or ""
@@ -164,7 +153,7 @@ async def get_maintenance_records(vin: str):
                 elif "검사" in description or "점검" in description:
                     record_type = "검사"
                 
-                records.append({
+                formatted_records.append({
                     "id": str(row['log_id']),
                     "vin": row['vin'],
                     "date": str(row['service_date']) if row['service_date'] else None,
@@ -186,8 +175,8 @@ async def get_maintenance_records(vin: str):
             
             # 농기계 기본 정보 포함하여 응답
             response = {
-                "records": records,
-                "total": len(records)
+                "records": formatted_records,
+                "total": len(formatted_records)
             }
             
             # 농기계 기본 정보 추가
@@ -234,8 +223,55 @@ async def create_maintenance_record(record: MaintenanceRecordCreate):
         with conn.cursor() as cursor:
             # 해당 농기계가 등록되어 있는지 확인
             cursor.execute("SELECT vin FROM machine_instance WHERE vin = %s", (vin,))
-            if not cursor.fetchone():
-                raise HTTPException(status_code=404, detail="등록되지 않은 농기계입니다.")
+            machine_exists = cursor.fetchone()
+            
+            # 농기계가 없으면 자동 등록
+            if not machine_exists:
+                # VIN에서 정보 추출
+                vin_upper = vin.upper()
+                if len(vin_upper) >= 8:
+                    mfg = vin_upper[0]
+                    cat = vin_upper[1]
+                    ident = vin_upper[2:-6]
+                    year_code = vin_upper[-6:-4]
+                    
+                    try:
+                        production_year = 2000 + int(year_code)
+                    except:
+                        production_year = 2020  # 기본값
+                    
+                    # model_id 조회
+                    cursor.execute("""
+                        SELECT model_id FROM machine_master 
+                        WHERE UPPER(mfg_code) = %s 
+                          AND UPPER(cat_code) = %s 
+                          AND (UPPER(model_identifier) = %s OR UPPER(model_identifier) = %s)
+                        LIMIT 1
+                    """, (mfg, cat, ident, ident.zfill(4)))
+                    
+                    model_result = cursor.fetchone()
+                    
+                    if model_result:
+                        # 모델 정보가 있으면 등록
+                        cursor.execute("""
+                            INSERT INTO machine_instance (vin, model_id, production_year, total_hours)
+                            VALUES (%s, %s, %s, %s)
+                        """, (vin, model_result['model_id'], production_year, mileage or 0))
+                        print(f"농기계 자동 등록 완료: {vin}")
+                    else:
+                        # 모델 정보가 없으면 기본값으로 등록 (model_id=1 또는 NULL)
+                        cursor.execute("""
+                            INSERT INTO machine_instance (vin, production_year, total_hours)
+                            VALUES (%s, %s, %s)
+                        """, (vin, production_year, mileage or 0))
+                        print(f"농기계 자동 등록 완료 (모델 정보 없음): {vin}")
+                else:
+                    # VIN 형식이 맞지 않으면 기본값으로 등록
+                    cursor.execute("""
+                        INSERT INTO machine_instance (vin, production_year, total_hours)
+                        VALUES (%s, %s, %s)
+                    """, (vin, 2020, mileage or 0))
+                    print(f"농기계 자동 등록 완료 (VIN 형식 불일치): {vin}")
             
             # 작업 유형 자동 결정
             record_type = "정비"

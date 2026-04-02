@@ -37,7 +37,7 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: ${MYSQL_USER:-agri_user}
-      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE:-agrilog_db}
       
       # API 키 (환경변수로 주입)
