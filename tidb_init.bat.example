@@ -1,0 +1,34 @@
+@echo off
+echo ========================================
+echo TiDB Cloud Database Initialization
+echo ========================================
+echo.
+
+REM TiDB Cloud 연결 정보 (실제 값으로 변경하세요)
+set TIDB_HOST=your-tidb-host.tidbcloud.com
+set TIDB_PORT=4000
+set TIDB_USER=your-username.root
+set TIDB_PASSWORD=your-password
+
+echo Connecting to TiDB Cloud...
+echo Host: %TIDB_HOST%
+echo Port: %TIDB_PORT%
+echo User: %TIDB_USER%
+echo.
+
+REM MySQL 클라이언트로 연결 및 init.sql 실행
+mysql -h %TIDB_HOST% -P %TIDB_PORT% -u %TIDB_USER% -p%TIDB_PASSWORD% --ssl-mode=REQUIRED < backend\init.sql
+
+if %ERRORLEVEL% EQU 0 (
+    echo.
+    echo ========================================
+    echo Database initialization completed!
+    echo ========================================
+) else (
+    echo.
+    echo ========================================
+    echo Error occurred during initialization
+    echo ========================================
+)
+
+pause

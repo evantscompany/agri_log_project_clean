@@ -12,13 +12,17 @@ services:
         value: 3.11.0
       - key: DB_HOST
         sync: false
+      - key: DB_PORT
+        value: 4000
       - key: DB_USER
         sync: false
       - key: DB_PASSWORD
         sync: false
       - key: DB_NAME
         value: agrilog_db
-      - key: GOOGLE_APPLICATION_CREDENTIALS
+      - key: DB_SSL
+        value: true
+      - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
         sync: false
       - key: OPENAI_API_KEY
         sync: false

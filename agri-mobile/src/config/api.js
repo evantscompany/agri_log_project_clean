@@ -1,6 +1,6 @@
 // API 설정
 export const API_CONFIG = {
-  BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.0.90:8000/api/v1',
+  BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL || 'https://agri-backend-yxxq.onrender.com/api/v1',
   TIMEOUT: parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT) || 30000,
 };
 

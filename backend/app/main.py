@@ -31,6 +31,8 @@ app.add_middleware(
         "http://localhost:5500",  # Live Server
         "http://192.168.0.30:8000",  # 로컬 네트워크 IP
         "http://192.168.0.30:8081",  # Expo 개발 서버
+        "https://agri-backend-yxxq.onrender.com",  # Render 배포 URL
+        "exp://",  # Expo Go 앱
         "null"  # 로컬 파일 직접 열기
     ],
     allow_credentials=True,
