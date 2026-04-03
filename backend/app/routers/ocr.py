@@ -22,13 +22,16 @@ from app.services.ocr_parser import parse_maintenance_details, extract_working_h
 router = APIRouter(prefix="/api/v1/ocr", tags=["OCR"])
 
 # Google Vision OCR 클라이언트 초기화
-# .env 파일의 GOOGLE_APPLICATION_CREDENTIALS 환경변수 사용
+# 환경 변수 또는 파일에서 credentials 로드
 try:
-    credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    vision_ocr = get_vision_ocr_client(credentials_path)
+    from app.utils.google_credentials import get_vision_credentials
+    credentials = get_vision_credentials()
+    vision_ocr = get_vision_ocr_client(credentials=credentials)
     VISION_API_AVAILABLE = True
+    print("✅ Google Vision API 초기화 성공")
 except Exception as e:
-    print(f"Google Vision API 초기화 실패: {e}")
+    print(f"⚠️ Google Vision API 초기화 실패: {e}")
+    print("OCR 기능이 제한됩니다. credentials를 설정하세요.")
     vision_ocr = None
     VISION_API_AVAILABLE = False
 

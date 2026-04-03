@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: agri-backend
+    runtime: python
+    region: singapore
+    plan: free
+    branch: main
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: agrilog_db
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+    healthCheckPath: /

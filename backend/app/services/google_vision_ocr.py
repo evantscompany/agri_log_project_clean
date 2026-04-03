@@ -13,20 +13,23 @@ from google.oauth2 import service_account
 class GoogleVisionOCR:
     """Google Vision API OCR 클래스"""
     
-    def __init__(self, credentials_path: Optional[str] = None):
+    def __init__(self, credentials_path: Optional[str] = None, credentials=None):
         """
         Google Vision API 클라이언트 초기화
         
         Args:
             credentials_path: 서비스 계정 JSON 키 파일 경로
-                             None이면 환경변수 GOOGLE_APPLICATION_CREDENTIALS 사용
+            credentials: Credentials 객체 (우선순위 높음)
         """
-        if credentials_path and os.path.exists(credentials_path):
+        if credentials:
+            # Credentials 객체가 직접 제공된 경우
+            self.client = vision.ImageAnnotatorClient(credentials=credentials)
+        elif credentials_path and os.path.exists(credentials_path):
             # 명시적으로 제공된 인증 정보 사용
-            credentials = service_account.Credentials.from_service_account_file(
+            creds = service_account.Credentials.from_service_account_file(
                 credentials_path
             )
-            self.client = vision.ImageAnnotatorClient(credentials=credentials)
+            self.client = vision.ImageAnnotatorClient(credentials=creds)
         else:
             # 환경변수 사용 (GOOGLE_APPLICATION_CREDENTIALS)
             self.client = vision.ImageAnnotatorClient()
@@ -202,14 +205,15 @@ class GoogleVisionOCR:
 
 
 # 싱글톤 인스턴스 생성
-def get_vision_ocr_client(credentials_path: Optional[str] = None) -> GoogleVisionOCR:
+def get_vision_ocr_client(credentials_path: Optional[str] = None, credentials=None) -> GoogleVisionOCR:
     """
     Google Vision OCR 클라이언트 인스턴스 반환
     
     Args:
         credentials_path: 서비스 계정 JSON 키 파일 경로
+        credentials: Credentials 객체 (우선순위 높음)
     
     Returns:
         GoogleVisionOCR 인스턴스
     """
-    return GoogleVisionOCR(credentials_path)
+    return GoogleVisionOCR(credentials_path, credentials)
