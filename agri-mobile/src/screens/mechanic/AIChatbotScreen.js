@@ -75,126 +75,24 @@ const AIChatbotScreen = ({ navigation, route }) => {
     setLoading(true);
 
     try {
-      // OpenAI API 직접 호출
-      const apiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
-      
-      if (!apiKey) {
-        const errorMessage = {
-          id: Date.now() + 1,
-          type: 'bot',
-          text: '⚠️ OpenAI API 키가 설정되지 않았습니다.\n.env 파일에 EXPO_PUBLIC_OPENAI_API_KEY를 설정해주세요.',
-        };
-        setMessages(prev => [...prev, errorMessage]);
-        setLoading(false);
-        return;
-      }
-      
-      // 농기계 정보 및 정비 이력 포함
-      let machineInfo = '';
-      if (machineData) {
-        machineInfo = `
-현재 조회 중인 농기계 정보:
-- 모델: ${machineData.model_name || machineData.model || 'N/A'}
-- 제조사: ${machineData.manufacturer_name || machineData.manufacturer || 'N/A'}
-- 연식: ${machineData.year || 'N/A'}년식
-- 가동시간: ${machineData.total_hours || 0}시간
-- VIN: ${machineData.vin || vin}`;
-      }
+      // 백엔드 API를 통해 AI 챗봇 호출
+      const chatHistory = messages
+        .filter(msg => msg.type !== 'system')
+        .map(msg => ({
+          role: msg.type === 'user' ? 'user' : 'assistant',
+          content: msg.text
+        }));
 
-      let historyInfo = '';
-      if (maintenanceHistory && maintenanceHistory.length > 0) {
-        historyInfo = `
-정비 이력 (최근 5개):
-${maintenanceHistory.slice(0, 5).map((record, index) => 
-  `${index + 1}. ${record.service_date}: ${record.description || '정비'} (${record.cost?.toLocaleString() || 0}원)${record.service_company ? ` - ${record.service_company}` : ''}`
-).join('\n')}
-
-총 정비 횟수: ${maintenanceHistory.length}건
-총 정비 비용: ${maintenanceHistory.reduce((sum, record) => sum + (record.cost || 0), 0).toLocaleString()}원`;
-      } else {
-        historyInfo = '\n정비 이력이 없습니다.';
-      }
-
-      const systemPrompt = `당신은 30년 경력의 농기계 정비 전문가입니다. 
-농기계(트랙터, 콤바인, 이앙기 등)의 정비, 고장 진단, 부품 교체, 유지보수에 대한 전문 지식을 가지고 있습니다.
-
-아래 제공된 농기계 정보와 정비 이력을 바탕으로 정확한 분석을 제공해주세요.
-
-${machineInfo}
-${historyInfo}
-
-주요 전문 분야:
-- 엔진계통: 디젤 엔진, 연료 시스템, 냉각 시스템
-- 유압계통: 유압 펌프, 실린더, 유압유 관리
-- 동력계통: 클러치, 변속기, 동력 전달 장치
-- 전기계통: 배터리, 발전기, 배선, 센서
-- 일반 정비: 오일 교환, 필터 관리, 정비 주기
-
-답변 스타일:
-- 위에 제공된 실제 정비 이력을 기반으로 분석
-- 친절하고 이해하기 쉽게 설명
-- 구체적인 점검 방법과 해결책 제시
-- 안전 주의사항 강조
-- 필요시 전문가 상담 권장
-- 한국어로 답변`;
-
-      const requestBody = JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: currentMessage }
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
+      const response = await apiService.chatWithAI({
+        vin: vin || null,
+        message: currentMessage,
+        history: chatHistory
       });
-
-      console.log('OpenAI API 요청:', requestBody);
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: requestBody
-      });
-
-      console.log('OpenAI API 응답 상태:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('OpenAI API 오류 응답:', errorText);
-        let errorData;
-        try {
-          errorData = JSON.parse(errorText);
-        } catch (e) {
-          errorData = { error: { message: errorText } };
-        }
-        throw new Error(errorData.error?.message || 'API 오류');
-      }
-
-      const responseText = await response.text();
-      console.log('OpenAI API 응답:', responseText);
-      
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error('JSON 파싱 오류:', e);
-        throw new Error('응답 파싱 실패');
-      }
-
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-        console.error('잘못된 응답 형식:', data);
-        throw new Error('잘못된 응답 형식');
-      }
-
-      const botResponse = data.choices[0].message.content;
 
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        text: botResponse,
+        text: response.message,
       };
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {

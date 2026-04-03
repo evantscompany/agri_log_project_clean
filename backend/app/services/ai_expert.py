@@ -369,6 +369,92 @@ class AIExpertService:
             print(f"[ERROR] AI 전문가 소견 생성 실패: {e}")
             return "전문가 소견 생성 중 오류가 발생했습니다."
     
+    def chat_with_expert(self, vin: Optional[str], message: str, history: List[Dict]) -> str:
+        """
+        AI 전문가와 대화
+        
+        Args:
+            vin: 농기계 번호 (선택)
+            message: 사용자 메시지
+            history: 대화 이력
+            
+        Returns:
+            AI 응답 메시지
+        """
+        if not self.is_service_available():
+            return "⚠️ AI 챗봇 서비스를 사용할 수 없습니다. 관리자에게 문의하세요."
+        
+        try:
+            # 농기계 정보 및 정비 이력 로드
+            machine_info_text = ""
+            history_text = ""
+            
+            if vin:
+                machine_info = self.get_machine_info(vin)
+                if machine_info:
+                    machine_info_text = f"""
+현재 조회 중인 농기계 정보:
+- 모델: {machine_info.get('model', 'N/A')}
+- 제조사: {machine_info.get('manufacturer', 'N/A')}
+- 연식: {machine_info.get('year', 'N/A')}년식
+- 가동시간: {machine_info.get('total_hours', 0)}시간
+- VIN: {vin}"""
+                
+                maintenance_history = self.get_maintenance_history(vin)
+                if maintenance_history:
+                    history_text = "\n정비 이력 (최근 5개):\n"
+                    for idx, record in enumerate(maintenance_history[:5], 1):
+                        history_text += f"{idx}. {record['date']}: {record['description']} ({record['cost']:,}원)\n"
+                    history_text += f"\n총 정비 횟수: {len(maintenance_history)}건"
+                else:
+                    history_text = "\n정비 이력이 없습니다."
+            
+            # 시스템 프롬프트
+            system_prompt = f"""당신은 30년 경력의 농기계 정비 전문가입니다. 
+농기계(트랙터, 콤바인, 이앙기 등)의 정비, 고장 진단, 부품 교체, 유지보수에 대한 전문 지식을 가지고 있습니다.
+
+{machine_info_text}
+{history_text}
+
+주요 전문 분야:
+- 엔진계통: 디젤 엔진, 연료 시스템, 냉각 시스템
+- 유압계통: 유압 펌프, 실린더, 유압유 관리
+- 동력계통: 클러치, 변속기, 동력 전달 장치
+- 전기계통: 배터리, 발전기, 배선, 센서
+- 일반 정비: 오일 교환, 필터 관리, 정비 주기
+
+답변 스타일:
+- 위에 제공된 실제 정비 이력을 기반으로 분석
+- 친절하고 이해하기 쉽게 설명
+- 구체적인 점검 방법과 해결책 제시
+- 안전 주의사항 강조
+- 필요시 전문가 상담 권장
+- 한국어로 답변"""
+            
+            # 메시지 구성
+            messages = [{"role": "system", "content": system_prompt}]
+            
+            # 대화 이력 추가 (최근 5개만)
+            for msg in history[-5:]:
+                messages.append({"role": msg.get("role"), "content": msg.get("content")})
+            
+            # 현재 메시지 추가
+            messages.append({"role": "user", "content": message})
+            
+            # OpenAI API 호출
+            response = self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages,
+                temperature=0.7,
+                max_tokens=1000
+            )
+            
+            return response.choices[0].message.content
+        
+        except Exception as e:
+            print(f"[ERROR] AI 챗봇 응답 생성 실패: {e}")
+            return f"⚠️ 죄송합니다. 응답 생성 중 오류가 발생했습니다.\n{str(e)}\n\n잠시 후 다시 시도해주세요."
+    
     def _create_expert_prompt(self, machine_info: Dict, maintenance_history: List[Dict], parts_summary: Dict) -> str:
         """
         전문가 소견 생성을 위한 프롬프트 생성

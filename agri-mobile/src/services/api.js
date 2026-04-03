@@ -218,6 +218,23 @@ export const apiService = {
     
     return response.data;
   },
+
+  // AI 챗봇
+  chatWithAI: async (data) => {
+    console.log('=== AI 챗봇 API 호출 ===');
+    console.log('요청 데이터:', data);
+    
+    const response = await apiClient.post('/ai-expert/chat', {
+      vin: data.vin,
+      message: data.message,
+      history: data.history || []
+    });
+    
+    console.log('=== AI 챗봇 API 응답 ===');
+    console.log('응답 데이터:', response.data);
+    
+    return response.data;
+  },
 };
 
 export default apiClient;

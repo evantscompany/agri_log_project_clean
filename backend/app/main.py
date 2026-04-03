@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.routers import machine, history, ocr, price_prediction, ai_expert, parts, maintenance, mechanic_ai
+from app.middleware.rate_limiter import rate_limit_middleware
 import os
 
 # FastAPI 앱 초기화
@@ -16,6 +17,9 @@ app = FastAPI(
     version="1.0.0",
     description="농기계 정보 조회 및 정비 이력 관리 API"
 )
+
+# Rate Limiting 미들웨어 추가
+app.middleware("http")(rate_limit_middleware)
 
 # CORS 설정: 프론트엔드(React)와의 통신 허용
 app.add_middleware(
