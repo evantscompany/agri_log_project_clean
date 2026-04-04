@@ -14,11 +14,11 @@ from app.models.schemas import MessageResponse
 router = APIRouter(prefix="/api/v1/ai-expert", tags=["AI Expert"])
 
 class ChatMessage(BaseModel):
-    role: str = Field(..., regex="^(user|assistant)$")
+    role: str = Field(..., pattern="^(user|assistant)$")
     content: str = Field(..., min_length=1, max_length=2000)
 
 class ChatRequest(BaseModel):
-    vin: Optional[str] = Field(None, regex="^[A-Z0-9]{17}$|^[가-힣0-9]{4,20}$")
+    vin: Optional[str] = Field(None, pattern="^[A-Z0-9]{17}$|^[가-힣0-9]{4,20}$")
     message: str = Field(..., min_length=1, max_length=1000)
     history: List[ChatMessage] = Field(default=[], max_items=10)
     
