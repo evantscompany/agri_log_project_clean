@@ -38,7 +38,7 @@ const OCRScannerScreen = ({ navigation, route }) => {
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: false,
       quality: 1,
     });
 
@@ -50,7 +50,7 @@ const OCRScannerScreen = ({ navigation, route }) => {
 
   const takePhoto = async () => {
     const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
+      allowsEditing: false,
       quality: 1,
     });
 
