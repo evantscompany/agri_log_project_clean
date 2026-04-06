@@ -161,6 +161,8 @@ test_*.py
 # 크롤링 및 데이터 파일
 크롤링용 파일/
 data/
+
+# 민감 정보 포함 문서 및 설정 파일
 VSCODE_DATABASE_CONNECTION.md
 DEPLOYMENT_GUIDE.md
 RENDER_DEPLOYMENT_STEPS.md
@@ -168,9 +170,9 @@ RENDER_ENV_VARIABLES.txt
 RENDER_SETUP_CHECKLIST.md
 TIDB_SETUP_COMPLETE.md
 DEPLOYMENT_SUCCESS.md
+PROJECT_SECURITY_STATUS.md
 backend/.env.tidb
 tidb_init.bat
 test_tidb_connection.py
 google_credentials_base64.txt
-backend/app/utils/google_credentials.py
-backend/app/utils/google_credentials.py
+SECURITY_AUDIT_REPORT.md
