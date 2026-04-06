@@ -424,7 +424,7 @@ async def process_ocr_and_save(
                 "message": "정비 이력이 성공적으로 저장되었습니다.",
                 "log_id": log_id,
                 "vin": vin,
-                "machine_info": vin_result["data"]
+                "machine_info": vin_result.get("data", {})
             }
     
     except HTTPException:
