@@ -146,30 +146,32 @@ def parse_maintenance_details(ocr_text: str) -> List[Dict]:
                 print(f"부품 정보 추출 오류 (라인: {line}): {e}")
                 continue
     
-    # 추가: 모든 부품번호 추출 (기존 파서가 놓친은 부품 보완)
+    # 추가: 모든 부품번호 추출 (기존 파서가 놓친 부품 보완)
+    # 단, part_list에 데이터가 있을 때만 시도
     all_part_numbers = extract_all_part_numbers(ocr_text)
     
-    for part_number in all_part_numbers:
-        # 이미 추출된 부품번호는 건너뛰기
-        if part_number not in [d['part_number'] for d in details]:
-            part_info = match_part_with_database(part_number)
-            if part_info:
-                # part_list 매칭 정보로 부품 정보 생성
-                detail = {
-                    'part_number': part_number,
-                    'part_name': part_info['part_name'],
-                    'quantity': 1,  # 기본값
-                    'unit_price': part_info['base_price'],
-                    'total_price': part_info['base_price'],
-                    'part_id': part_info['part_id'],
-                    'matched_part_name': part_info['part_name'],
-                    'base_price': part_info['base_price'],
-                    'base_labor': part_info.get('base_labor', 0),
-                    'system_group': part_info.get('system_group', ''),
-                    'source': 'enhanced'  # 추출 출처 표시
-                }
-                details.append(detail)
-                print(f"[DEBUG] 부품번호만으로 추출 성공: {part_number} -> {part_info['part_name']}")
+    if all_part_numbers:
+        for part_number in all_part_numbers:
+            # 이미 추출된 부품번호는 건너뛰기
+            if part_number not in [d['part_number'] for d in details]:
+                part_info = match_part_with_database(part_number)
+                if part_info:
+                    # part_list 매칭 정보로 부품 정보 생성
+                    detail = {
+                        'part_number': part_number,
+                        'part_name': part_info['part_name'],
+                        'quantity': 1,  # 기본값
+                        'unit_price': part_info['base_price'],
+                        'total_price': part_info['base_price'],
+                        'part_id': part_info['part_id'],
+                        'matched_part_name': part_info['part_name'],
+                        'base_price': part_info['base_price'],
+                        'base_labor': part_info.get('base_labor', 0),
+                        'system_group': part_info.get('system_group', ''),
+                        'source': 'enhanced'  # 추출 출처 표시
+                    }
+                    details.append(detail)
+                    print(f"[DEBUG] 부품번호만으로 추출 성공: {part_number} -> {part_info['part_name']}")
     
     print(f"총 {len(details)}개의 부품 정보 추출됨")
     return details
@@ -643,6 +645,14 @@ def match_part_with_database(part_number: str) -> Optional[Dict]:
             return None
         
         with conn.cursor() as cursor:
+            # part_list 테이블에 데이터가 있는지 먼저 확인
+            cursor.execute("SELECT COUNT(*) as count FROM part_list")
+            count_result = cursor.fetchone()
+            
+            if count_result and count_result['count'] == 0:
+                # part_list가 비어있으면 매칭 시도하지 않음
+                return None
+            
             # 정확한 매칭 시도
             cursor.execute("""
                 SELECT part_id, part_number, part_name, base_price, base_labor, system_group
