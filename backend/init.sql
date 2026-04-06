@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS ocr_raw_data (
     attachment_id INT DEFAULT NULL COMMENT '첨부파일 ID',
     raw_text TEXT COMMENT 'OCR 원본 텍스트',
     parsed_data JSON COMMENT '파싱된 구조화 데이터 (JSON)',
+    image_path VARCHAR(500) NULL COMMENT '이미지 파일 경로',
     parsing_version VARCHAR(20) DEFAULT '1.0' COMMENT '파싱 로직 버전',
     parsing_status ENUM('SUCCESS','PARTIAL','FAILED') DEFAULT 'SUCCESS' COMMENT '파싱 상태',
     extracted_vin VARCHAR(50) COMMENT '추출된 기대번호',
