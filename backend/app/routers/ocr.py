@@ -431,6 +431,9 @@ async def process_ocr_and_save(
         raise
     except Exception as e:
         conn.rollback()
+        print(f"❌ 저장 중 오류 발생: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"저장 중 오류 발생: {str(e)}")
     finally:
         conn.close()
