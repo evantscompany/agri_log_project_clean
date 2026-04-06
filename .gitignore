@@ -176,3 +176,7 @@ tidb_init.bat
 test_tidb_connection.py
 google_credentials_base64.txt
 SECURITY_AUDIT_REPORT.md
+
+# 모든 MD 파일 제외 (문서화 파일)
+*.md
+!README.md
