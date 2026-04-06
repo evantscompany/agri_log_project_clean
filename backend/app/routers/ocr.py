@@ -18,6 +18,7 @@ from app.database import get_db_connection
 from app.services.vin_parser import parse_agri_vin
 from app.services.google_vision_ocr import get_vision_ocr_client
 from app.services.ocr_parser import parse_maintenance_details, extract_working_hours, parse_service_company
+from app.services.part_list_manager import save_ocr_parts_to_list
 
 router = APIRouter(prefix="/api/v1/ocr", tags=["OCR"])
 
@@ -341,6 +342,16 @@ async def process_ocr_and_save(
             if ocr_text:
                 try:
                     details = parse_maintenance_details(ocr_text)
+                    
+                    # OCR로 추출된 부품 정보를 part_list에 저장 (검증 없이)
+                    if details:
+                        part_id_map = save_ocr_parts_to_list(details)
+                        # 저장된 part_id를 details에 업데이트
+                        for detail in details:
+                            part_number = detail.get('part_number')
+                            if part_number and part_number in part_id_map:
+                                detail['part_id'] = part_id_map[part_number]
+                                print(f"✅ 부품 part_list 저장 완료: {part_number} (part_id: {part_id_map[part_number]})")
                     
                     # OCR 원본 파싱 데이터 저장 (향후 파싱 로직 개선용)
                     import json
