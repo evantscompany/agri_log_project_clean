@@ -171,3 +171,6 @@ DEPLOYMENT_SUCCESS.md
 backend/.env.tidb
 tidb_init.bat
 test_tidb_connection.py
+google_credentials_base64.txt
+backend/app/utils/google_credentials.py
+backend/app/utils/google_credentials.py
