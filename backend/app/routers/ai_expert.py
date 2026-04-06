@@ -18,7 +18,7 @@ class ChatMessage(BaseModel):
     content: str = Field(..., min_length=1, max_length=2000)
 
 class ChatRequest(BaseModel):
-    vin: Optional[str] = Field(None, pattern="^[A-Z0-9]{17}$|^[가-힣0-9]{4,20}$")
+    vin: Optional[str] = Field(None, min_length=4, max_length=20)
     message: str = Field(..., min_length=1, max_length=1000)
     history: List[ChatMessage] = Field(default=[], max_items=10)
     
@@ -41,8 +41,8 @@ async def get_expert_opinion(vin: str):
         전문가 소견 (최대 500자)
     """
     try:
-        # VIN 입력 검증
-        if not re.match(r'^[A-Z0-9]{17}$|^[가-힣0-9]{4,20}$', vin):
+        # VIN 입력 검증 (농기계 VIN 형식: DI0060240001 등)
+        if not vin or len(vin) < 4 or len(vin) > 20:
             raise HTTPException(status_code=400, detail="올바르지 않은 VIN 형식입니다.")
         
         print(f"[DEBUG] AI 전문가 소견 API 호출 - VIN: {vin}")
