@@ -594,9 +594,13 @@ def extract_part_info_multiline(lines: List[str], start_idx: int, part_number: s
                     pass
                 break
     
-    # 유효성 검사
-    if not part_name.strip() or total_price == 0:
+    # 유효성 검사 완화 - 부품번호만 있어도 저장
+    if not part_number:
         return None
+    
+    # 부품명이 없으면 부품번호를 부품명으로 사용
+    if not part_name.strip():
+        part_name = part_number
     
     # 기본 정보 반환 (part_list 매칭 정보 우선)
     result = {
