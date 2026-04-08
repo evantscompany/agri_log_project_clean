@@ -180,3 +180,5 @@ SECURITY_AUDIT_REPORT.md
 # 모든 MD 파일 제외 (문서화 파일)
 *.md
 !README.md
+tidb_excel_exporter.py
+exports/tidb_export_combined_20260409_001235.xlsx
